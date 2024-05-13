@@ -11,12 +11,12 @@ locals {
     }
   )
 
-  env_config = format("{\"SQL_URI\":\"postgresql+psycopg2://%s:%s@%s:%d/%s", var.username, var.password, var.db_host, var.db_port, var.db_name)
+  env_config = format("{\"SQL_URI\":\"postgresql+psycopg2://%s:%s@%s:%d/%s}", var.username, var.password, var.db_host, var.db_port, var.db_name)
 }
 
-resource "kubernetes_deployment" "db" {
+resource "kubernetes_deployment" "web-app" {
   metadata {
-    name = "postgres"
+    name = "webapp"
     labels = local.common_labels
     namespace = var.namespace
   }
@@ -37,6 +37,7 @@ resource "kubernetes_deployment" "db" {
         container {
           image = format("%s:%s", var.image_name, var.image_tag)
           name  = regex("[[:alnum:]]+$", var.image_name)
+          image_pull_policy = "Always"
 
           port {
             container_port = var.container_port
